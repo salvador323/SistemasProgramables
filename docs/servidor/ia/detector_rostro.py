@@ -15,6 +15,9 @@
 import cv2
 import os
 import numpy as np
+import os 
+
+ruta_base = os.path.dirname(os.path.abspath(__file__))
 
 class DetectorRostro:
     def __init__(self, ruta_prototxt, ruta_modelo, umbral_confianza=0.7):
@@ -54,13 +57,17 @@ def validar_modelo():
           falsos positivos (FP), etc.
     Devuelve: Nada (Imprime los resultados en consola).
     """
-    carpeta_base = "datos_validacion"
+    DIR_ACTUAL = os.path.dirname(os.path.abspath(__file__))
+
+    # Construye la ruta perfecta sin importar en qué PC corra:
+    carpeta_base = os.path.join(DIR_ACTUAL, "datos_validacion")
+
     # Nota: El equipo debe crear manualmente las subcarpetas 'con_rostro' y 'sin_rostro' 
     # dentro de 'datos_validacion/' y poner ahí algunas fotos para correr esta prueba.
     
     detector = DetectorRostro(
-        ruta_prototxt="modelos/deploy.prototxt", 
-        ruta_modelo="modelos/res10_300x300_ssd_iter_140000.caffemodel"
+        ruta_prototxt=os.path.join(ruta_base, "modelos", "deploy.prototxt"),
+        ruta_modelo=os.path.join(ruta_base, "modelos", "res10_300x300_ssd_iter_140000.caffemodel")
     )
     
     vp, vn, fp, fn = 0, 0, 0, 0
@@ -92,7 +99,7 @@ def validar_modelo():
         print(f"Total imágenes: {total}")
         print(f"Precisión: {precision * 100:.2f}%")
         print(f"Recall: {recall * 100:.2f}%")
-        print("¡Anota estos valores en el encabezado del archivo y reemplaza los [pendiente]!")
+        
     else:
         print("No se encontraron imágenes de prueba en la carpeta 'datos_validacion/'.")
 
