@@ -8,4 +8,4 @@
 | Servomotor (SG90) | Actuador | GPIO 18 | aurabot/actuador/servo/central | aurabot/comando/servo/central | Grados (Texto) | 0 a 180 |
 | Relevador (1 Canal) | Actuador | GPIO 23 | aurabot/actuador/relevador/central | aurabot/comando/relevador/central | 1/0 (Texto) | 0 a 1 |
 | Pantalla OLED | Actuador | SDA: 21, SCL: 22 | aurabot/actuador/oled/central | aurabot/comando/oled/central | Expresión | N/A |
-| ESP32-CAM | Cámara | N/A (Mapeo interno) | aurabot/sensor/camara/cam | --- | JPEG (Bytes) | 38,400 (QQVGA) |
+| ESP32-WROVER | Cámara | N/A (Mapeo interno) | aurabot/sensor/camara/cam | --- | JPEG (Bytes) | 38,400 (QQVGA) |
