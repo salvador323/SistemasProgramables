@@ -4,9 +4,10 @@
 Prototipo IoT para estación de trabajo que mide tiempo de sesión, distancia a la pantalla y presencia, invitando al usuario a realizar pausas activas (luz cálida, movimiento y audio guiado).
 
 ## Integrantes
-* Sandoval Cuevas Pedro - [pendiente]
+* Barroso Garcia Braulio Axel - [23240327]
 * Taboada Ramírez Salvador - [pendiente]
-* Barroso Garcia Braulio Axel - [pendiente]
+* Sandoval Cuevas Pedro - [23240325]
+
 
 ## Estructura del Repositorio
 * `firmware/`: Código MicroPython para ESP32 Central y ESP32-CAM.
