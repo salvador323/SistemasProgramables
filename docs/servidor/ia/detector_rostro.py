@@ -3,7 +3,7 @@
 # Archivo:   detector_rostro.py
 # Objetivo:  Detectar presencia de un rostro usando modelo SSD de OpenCV
 # Equipo:    Sandoval Cuevas Pedro, Taboada Ramírez Salvador,
-#            Barroso Garcia Braulio Axel (matrículas: [pendiente])
+#            Barroso Garcia Braulio Axel (matrículas: 23240325, "pendiente", 23240327)
 # Materia:   Sistemas Programables — ISC TecNM León
 # Semestre:  ago-dic-2026
 # MODELO:                 ResNet-10 SSD (Caffe)
