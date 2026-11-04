@@ -1,3 +1,21 @@
+#   Credenciales de Fire Base
+
+{
+  "type": "service_account",
+  "project_id": "aurabot-4ba95",
+  "private_key_id": "c89e74971ea7b8b4453699dcd0447caa3885cb4e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCrw/YmEoaveAKz\n2fCBSnwH43QdB30dySpsUbDNx/IAA+MxVtQuoiezc2N3aT9uCPiTRqehEI5mDUN+\n0bwI+E7cTGcyxGW5XEt45iy1jz2Ax/BTRR7XhEtwft+UsWH3XAJWfBzYPzxEWSlG\nEXzkMBo/Mx7L3A/pgsNCDFEseN3V34uC25brNiLi11bYClILximogROrQi52jgUI\nTjYP4Ewj/ht8GSwnlSmq3gbv6HMzTjs6/AvpDiOmswcqGpDBEsDqbSolG8qYM/Ci\nHaWNer86wDm/MfN3Ax6Bi7Ot31lWXWws5XX+NmVqMkrX/8Dv98xI4uEEDWEnWg7m\nl8MIeiJ1AgMBAAECggEAHdjuUdTXzy97Rr35HzpufZ9ueqnlubKOeuaiIswbFxoV\n1WnJcrYOUI5dSy+AjHImIc9+Cwy5te2ZnDS9aFCfwYPMTgPXSmPJoJ9cxwr2TMXR\nkuK4toogYtLFLs05IRb9uAIWsBQi+JyGwcyBp5RdRzyung2mPTVSEUzbIS96mvKV\n5Qiem3oykXHhNZMiGyx8Pg1bDccCnQhkcQoFdqzbVjjcfN4M9PDIajinjNtfYLA5\nc9MUitdVs+EnSycPvF24Humf1zNWKR6EUbF31wduF6fTOmMBXfx1dJulE8qZvwcN\nRCnNcG5zVrCzv5j7MaJ+CU7GJRB+nhEyGi9wOGX/CQKBgQDUfADBuT5YbUCgpe/0\nPGbE9KMUjd4cEuGtzJNbsz4iAbVydvR3JG9Ep6FRIavhEx0kdwrZ15u30pdhl0Tc\njdbwvO/HpN4YL5jm9nQ3BBOBzlaOmM/7IGqd0N+rFeP4MAjUPTY5ijp2Oq5eb8pr\nGvGSgavx/EXkiE8ddXnjvrWeOQKBgQDO8SxW8B6CrJAjfyvVnLxl1NNEEp3DBnId\nQr6IrcmtZPsp6UvY9mh51jn0uwYutapmpm/1my+iWliveXV6ZW5TEl5c/ehYmWG4\n+IGrtthB7y1AnZ/jpXCwAfAlt5EnFTHLZ0dM/hl3T7/u8MPWGLGwO1Xx6r/sjjuA\nEIQ9T8DmHQKBgQCozwNC5Mp1MgbgGjSyUrJK0xgkojjNEOseSqLffV1lYvomP/8k\nEFwdrRdp/1gv7iF+8Nw8CSD7P2Fo9OaOWlli1Jeigoa3rEjLZQ0bEC/3Nlhp3VmO\nZ0iMrH6lyzRb3r2E8ER+HiUn/KK/AA1OXg+Bl2dlTkiwsOI5wzTdDIv5cQKBgQC0\nt8iQ44DBfREi7pvJH+cmxoT4nYlIFwjwpKjfk2TcF6N/Jk0mW4lBXOOf5POxNtRo\ncFC1m6Atl9h65QbCrHF7+j6N1u5g8RF2Bw62dibE7aoHE5/dnUybaBXf2j7YcpnZ\nl4ecpQp4NxzV/UwIW+hQjoCvkuGoI02yuLnDETLTwQKBgDeV85I+JSSIBJSKRuw5\n3FQm652VKD+euCcbo83AHR2HQ4AkW9DR1P1mQhp4nVknkzu9va6UVVXG4MYS9l+N\nCNckbg5ZLbx+5f1xFJzI1R3EIgO8KMgG/sRWH7J3uwZnLzQxKoAI+ngHziugehME\nRi89u0QL+mFqHf5Nf6Pdvx57\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@aurabot-4ba95.iam.gserviceaccount.com",
+  "client_id": "107468671941604922370",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40aurabot-4ba95.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
+
+
+
 # Credenciales y archivos sensibles
 config.py
 config_web.js
