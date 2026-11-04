@@ -1,0 +1,12 @@
+# Credenciales y archivos sensibles
+config.py
+config_web.js
+serviceAccountKey.json
+
+# Entornos virtuales y caché de Python
+__pycache__/
+.venv/
+*.pyc
+
+# Imágenes de prueba (Privacidad)
+servidor/ia/datos_validacion/
