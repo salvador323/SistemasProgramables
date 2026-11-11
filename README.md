@@ -6,9 +6,9 @@
 ### Integrantes:
 | Nombre | Matrícula | Rol | GitHub |
 | :--- | :--- | :--- | :--- |
-| Sandoval Cuevas Pedro | 23240325 | 🔧 Firmware ESP32 | [@usuario](https://github.com/) |
-| Taboada Ramírez Salvador | 23240999 | 🧠 Servidor Python/IA | [@usuario](https://github.com/) |
-| Barroso Garcia Braulio Axel | 23240327 | ☁️ Firebase / 🔩 Hardware | [@usuario](https://github.com/) |
+| Sandoval Cuevas Pedro | 23240325 | 🔧 Firmware ESP32 | [Pedro384e](https://github.com/) |
+| Taboada Ramírez Salvador | 23240999 | 🧠 Servidor Python/IA | [salvador323](https://github.com/) |
+| Barroso Garcia Braulio Axel | 23240327 | ☁️ Firebase / 🔩 Hardware | [AxelCuber15](https://github.com/) |
 
 ---
 
