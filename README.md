@@ -13,10 +13,11 @@
 ---
 
 ## Descripción General
-AuraBot es un asistente robótico de escritorio diseñado para interactuar mediante reconocimiento facial y visión artificial. 
-- **¿A quién ayuda?** A usuarios de escritorio que buscan una interfaz física e interactiva para su entorno de trabajo.
-- **¿Qué problema resuelve?** Automatiza respuestas físicas (movimiento, expresiones faciales, música y control de energía) basándose en la presencia y la identidad de la persona sin comprometer su privacidad (procesamiento en RAM).
-- **¿Cómo lo resuelve?** Combina una ESP32-CAM para captura de video, un servidor Python local para IA (OpenCV) sin persistencia de datos personales, y un ESP32 central que gestiona actuadores y telemetría vía MQTT.
+AuraBot es un Sistema Inteligente de Monitoreo Ergonómico y Asistencia Cognitiva diseñado para la intervención temprana de estrés y malas posturas en entornos de trabajo remoto.
+
+- **¿A quién ayuda?** A estudiantes universitarios de ingeniería y profesionales del sector tecnológico que enfrentan jornadas extensas frente al monitor en condiciones de aislamiento.
+- **¿Qué problema resuelve?** Combate la incidencia de fatiga mental, estrés académico y episodios de ansiedad silenciosa, así como la disminución del rendimiento cognitivo por malas posturas y la falta de pausas activas.
+- **¿Cómo lo resuelve de forma diferente a lo que ya existe?** Mediante Edge Computing. El sistema evalúa la biometría facial en memoria volátil (garantizando total privacidad sin subir fotos a la nube) y la postura física. Al detectar alteraciones, despliega un protocolo físico de *grounding*: activa iluminación terapéutica, reproduce estímulos auditivos guiados y marca ritmos de respiración visuales y mecánicos para evitar que la ansiedad escale a episodios críticos.
 
 ---
 
