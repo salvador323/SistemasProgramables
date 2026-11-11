@@ -1,22 +1,63 @@
-# AuraBot: Sistema Inteligente de Monitoreo Ergonómico y Asistencia Cognitiva
+# AuraBot — Asistente Interactivo de Escritorio
+  
+**Semestre:** ago-dic-2026  
+**Materia:** Sistemas Programables — ISC TecNM León  
 
-## Objetivo
-Prototipo IoT para estación de trabajo que mide tiempo de sesión, distancia a la pantalla y presencia, invitando al usuario a realizar pausas activas (luz cálida, movimiento y audio guiado).
+### Integrantes:
+| Nombre | Matrícula | Rol | GitHub |
+| :--- | :--- | :--- | :--- |
+| Sandoval Cuevas Pedro | 23240325 | 🔧 Firmware ESP32 | [@usuario](https://github.com/) |
+| Taboada Ramírez Salvador | 23240999 | 🧠 Servidor Python/IA | [@usuario](https://github.com/) |
+| Barroso Garcia Braulio Axel | 23240327 | ☁️ Firebase / 🔩 Hardware | [@usuario](https://github.com/) |
 
-## Integrantes
-* Barroso Garcia Braulio Axel - [23240327]
-* Taboada Ramírez Salvador - [pendiente]
-* Sandoval Cuevas Pedro - [23240325]
+---
 
+## Descripción General
+AuraBot es un asistente robótico de escritorio diseñado para interactuar mediante reconocimiento facial y visión artificial. 
+- **¿A quién ayuda?** A usuarios de escritorio que buscan una interfaz física e interactiva para su entorno de trabajo.
+- **¿Qué problema resuelve?** Automatiza respuestas físicas (movimiento, expresiones faciales, música y control de energía) basándose en la presencia y la identidad de la persona sin comprometer su privacidad (procesamiento en RAM).
+- **¿Cómo lo resuelve?** Combina una ESP32-CAM para captura de video, un servidor Python local para IA (OpenCV) sin persistencia de datos personales, y un ESP32 central que gestiona actuadores y telemetría vía MQTT.
 
-## Estructura del Repositorio
-* `firmware/`: Código MicroPython para ESP32 Central y ESP32-CAM.
-* `servidor/`: Scripts de Python para procesamiento OpenCV, puente MQTT y Firebase.
-* `dashboard/`: Interfaz web de monitoreo y control.
-* `docs/`: Documentación del hardware (Tabla HAL) y reporte final.
-* `firebase/`: Reglas de seguridad y esquema de la base de datos.
-* `hardware/`: Archivos 3D y esquemático.
+---
 
-## Firmware Utilizado
-* ESP32 Central: [pendiente - nombre y URL del .bin]
-* ESP32-CAM: [pendiente - nombre y URL del .bin]
+## Arquitectura del Sistema
+![Diagrama de Arquitectura](../hardware/esquematico.png) 
+*(Nota: Actualizar con la imagen final del diagrama de flujo)*
+
+### Tópicos MQTT
+| Tópico | Dirección | Descripción |
+| :--- | :--- | :--- |
+| `aurabot/sensor/pir/central` | ESP32 → Broker | Lectura binaria de presencia (PIR) |
+| `aurabot/sensor/ultrasonico/central` | ESP32 → Broker | Distancia en centímetros |
+| `aurabot/sensor/luz/central` | ESP32 → Broker | Nivel de iluminación en porcentaje |
+| `aurabot/cam/frame` | ESP32-CAM → Broker | Transmisión de frames de video |
+| `aurabot/comando/relevador/central` | Broker → ESP32 | Comando "encender" / "apagar" |
+| `aurabot/comando/servo/central` | Broker → ESP32 | Comando "saludar" / "reposo" |
+| `aurabot/comando/oled/central` | Broker → ESP32 | Comando "feliz" / "neutral" / "apagada" |
+
+---
+
+## Hardware
+
+| # | Componente | Tipo | Cantidad | Costo aprox. MXN |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | ESP32 DevKit V1 | Microcontrolador | 1 | $120 |
+| 2 | ESP32-CAM | Cámara / Visión | 1 | $130 |
+| 3 | Sensor PIR (HC-SR501) | Sensor | 1 | $45 |
+| 4 | Ultrasónico (HC-SR04) | Sensor | 1 | $40 |
+| 5 | Fotorresistencia (LDR) | Sensor | 1 | $15 |
+| 6 | Servomotor SG90 | Actuador | 1 | $55 |
+| 7 | Pantalla OLED SSD1306 | Actuador | 1 | $70 |
+| 8 | Relevador 5V (1 Canal) | Actuador | 1 | $35 |
+| **Total** | | | | **< $600 MXN** |
+
+### Diagrama de conexiones
+![Circuito Protoboard](../media/circuito_protoboard.jpg)
+
+---
+
+## Software y Firmware
+
+**Requisitos del servidor Python**
+```bash
+pip install -r servidor/requirements.txt

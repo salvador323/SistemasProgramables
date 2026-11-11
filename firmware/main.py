@@ -4,7 +4,7 @@
 # Objetivo:  Bucle principal no bloqueante y nexo entre HAL y MQTT
 # Equipo:    Sandoval Cuevas Pedro, Taboada Ramírez Salvador,
 #            Barroso Garcia Braulio Axel
-# Matrículas: 23240325, 23240999, 23240
+# Matrículas: 23240325, 23240999, 23240327
 # Materia:   Sistemas Programables — ISC TecNM León
 # Semestre:  ago-dic-2026
 # ============================================
