@@ -1,107 +1,109 @@
-# ============================================
-# Proyecto:  AuraBot
-# Archivo:   detector_rostro.py
-# Objetivo:  Detectar presencia de un rostro usando modelo SSD de OpenCV
-# Equipo:    Sandoval Cuevas Pedro, Taboada Ramírez Salvador,
-#            Barroso Garcia Braulio Axel (matrículas: 23240325, "pendiente", 23240327)
-# Materia:   Sistemas Programables — ISC TecNM León
-# Semestre:  ago-dic-2026
-# MODELO:                 ResNet-10 SSD (Caffe)
-# PREDICCIÓN:             Clasificación binaria (Rostro detectado / No detectado)
-# PRECISIÓN APROXIMADA:   [pendiente]%
-# RECALL APROXIMADO:      [pendiente]%
-# ============================================
-
+import paho.mqtt.client as mqtt
 import cv2
-import os
 import numpy as np
-import os 
+import os
+import sys
+import json
 
-ruta_base = os.path.dirname(os.path.abspath(__file__))
+IP_BROKER = "127.0.0.1"
+PUERTO = 1883
+TOPICO_CAMARA = "aurabot/sensor/camara/cam"
+TOPICO_ESTADO_ROSTRO = "aurabot/estado_actual/rostro"
 
-class DetectorRostro:
-    def __init__(self, ruta_prototxt, ruta_modelo, umbral_confianza=0.7):
-        """
-        Inicializa el modelo de red neuronal.
-        Recibe: Rutas a los archivos de configuración (.prototxt) y pesos (.caffemodel).
-        Hace: Carga el modelo SSD en memoria.
-        Devuelve: Objeto de la clase DetectorRostro.
-        """
-        self.umbral = umbral_confianza
-        self.red_neuronal = cv2.dnn.readNetFromCaffe(ruta_prototxt, ruta_modelo)
+script_dir = os.path.dirname(os.path.abspath(__file__))
+ruta_xml = os.path.join(script_dir, "haarcascade_frontalface_default.xml")
+ruta_modelo = os.path.join(script_dir, "modelo_rostro.yml")
+ruta_nombres = os.path.join(script_dir, "usuarios.json")
 
-    def analizar_imagen(self, imagen):
-        """
-        Procesa una imagen para buscar rostros.
-        Recibe: Matriz de imagen (numpy array de OpenCV).
-        Hace: Convierte la imagen a un blob, la pasa por la red neuronal y cuenta las detecciones válidas.
-        Devuelve: Booleano (True si hay al menos un rostro con confianza > umbral, False en caso contrario).
-        """
-        (alto, ancho) = imagen.shape[:2]
-        blob = cv2.dnn.blobFromImage(cv2.resize(imagen, (300, 300)), 1.0, (300, 300), (104.0, 177.0, 123.0))
+nombres = {"0": "Desconocido"}
+if os.path.exists(ruta_nombres):
+    with open(ruta_nombres, "r") as f:
+        nombres = json.load(f)
+
+face_cascade = cv2.CascadeClassifier(ruta_xml)
+if face_cascade.empty() or not os.path.exists(ruta_modelo):
+    print("[!] ERROR: Archivos del modelo no encontrados.")
+    sys.exit()
+
+recognizer = cv2.face.LBPHFaceRecognizer_create()
+recognizer.read(ruta_modelo)
+
+contador_ausente = 0
+UMBRAL_ESTABILIDAD = 5
+estado_anterior = None
+
+def al_conectar(cliente, userdata, flags, rc, properties=None):
+    print(f"[✓] Conectado a Mosquitto (Código: {rc})")
+    cliente.subscribe(TOPICO_CAMARA)
+
+def al_recibir_mensaje(cliente, userdata, msg):
+    global contador_ausente, estado_anterior
+    try:
+        nparr = np.frombuffer(msg.payload, np.uint8)
+        if len(nparr) == 38400:
+            frame16 = nparr.view(np.uint16).byteswap().reshape((120, 160))
+            b = (frame16 & 0x1F) << 3
+            g = ((frame16 >> 5) & 0x3F) << 2
+            r = ((frame16 >> 11) & 0x1F) << 3
+            frame = np.dstack((b, g, r)).astype(np.uint8)
+            frame = cv2.resize(frame, (320, 240), interpolation=cv2.INTER_LINEAR)
+        else:
+            return
+
+        grises = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        grises = cv2.equalizeHist(grises)
         
-        self.red_neuronal.setInput(blob)
-        detecciones = self.red_neuronal.forward()
+        rostros = face_cascade.detectMultiScale(grises, scaleFactor=1.1, minNeighbors=6, minSize=(30, 30))
         
-        for i in range(0, detecciones.shape[2]):
-            confianza = detecciones[0, 0, i, 2]
-            if confianza > self.umbral:
-                return True
-        return False
+        rostro_valido = []
+        if len(rostros) > 0:
+            rostro_principal = max(rostros, key=lambda r: r[2] * r[3])
+            rostro_valido = [rostro_principal]
 
-def validar_modelo():
-    """
-    Ejecuta una prueba del modelo con imágenes estáticas para calcular precisión.
-    Recibe: Nada.
-    Hace: Lee imágenes de 'datos_validacion/', las analiza y calcula verdaderos positivos (VP), 
-          falsos positivos (FP), etc.
-    Devuelve: Nada (Imprime los resultados en consola).
-    """
-    DIR_ACTUAL = os.path.dirname(os.path.abspath(__file__))
+        nombre_persona_actual = "Desconocido"
 
-    # Construye la ruta perfecta sin importar en qué PC corra:
-    carpeta_base = os.path.join(DIR_ACTUAL, "datos_validacion")
-
-    # Nota: El equipo debe crear manualmente las subcarpetas 'con_rostro' y 'sin_rostro' 
-    # dentro de 'datos_validacion/' y poner ahí algunas fotos para correr esta prueba.
-    
-    detector = DetectorRostro(
-        ruta_prototxt=os.path.join(ruta_base, "modelos", "deploy.prototxt"),
-        ruta_modelo=os.path.join(ruta_base, "modelos", "res10_300x300_ssd_iter_140000.caffemodel")
-    )
-    
-    vp, vn, fp, fn = 0, 0, 0, 0
-
-    print("Iniciando validación del modelo...")
-    
-    # Evaluar imágenes con rostro (Esperado: True)
-    ruta_con = os.path.join(carpeta_base, "con_rostro")
-    if os.path.exists(ruta_con):
-        for archivo in os.listdir(ruta_con):
-            imagen = cv2.imread(os.path.join(ruta_con, archivo))
-            if imagen is not None:
-                if detector.analizar_imagen(imagen): vp += 1
-                else: fn += 1
-
-    # Evaluar imágenes sin rostro (Esperado: False)
-    ruta_sin = os.path.join(carpeta_base, "sin_rostro")
-    if os.path.exists(ruta_sin):
-        for archivo in os.listdir(ruta_sin):
-            imagen = cv2.imread(os.path.join(ruta_sin, archivo))
-            if imagen is not None:
-                if not detector.analizar_imagen(imagen): vn += 1
-                else: fp += 1
-
-    total = vp + vn + fp + fn
-    if total > 0:
-        precision = vp / (vp + fp) if (vp + fp) > 0 else 0
-        recall = vp / (vp + fn) if (vp + fn) > 0 else 0
-        print(f"Total imágenes: {total}")
-        print(f"Precisión: {precision * 100:.2f}%")
-        print(f"Recall: {recall * 100:.2f}%")
+        for (x, y, w, h) in rostro_valido:
+            rostro_recortado = grises[y:y+h, x:x+w]
+            rostro_recortado = cv2.resize(rostro_recortado, (100, 100))
+            
+            # --- MISMO FILTRO DE SUAVIZADO AL RECONOCER ---
+            rostro_recortado = cv2.GaussianBlur(rostro_recortado, (3, 3), 0)
+            
+            id_predicho, distancia = recognizer.predict(rostro_recortado)
+            
+            # Umbral de tolerancia ampliado a 85 gracias al filtro Gaussiano
+            if distancia < 85:
+                nombre_persona_actual = nombres.get(str(id_predicho), "Desconocido")
+                color_recuadro = (0, 255, 0)
+            else:
+                nombre_persona_actual = nombres["0"]
+                color_recuadro = (0, 0, 255)
+            
+            cv2.rectangle(frame, (x, y), (x + w, y + h), color_recuadro, 2)
+            cv2.putText(frame, f"{nombre_persona_actual} ({int(distancia)})", (x, y - 10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, color_recuadro, 2)
         
-    else:
-        print("No se encontraron imágenes de prueba en la carpeta 'datos_validacion/'.")
+        if len(rostro_valido) > 0:
+            contador_ausente = 0
+            if estado_anterior != nombre_persona_actual:
+                cliente.publish(TOPICO_ESTADO_ROSTRO, nombre_persona_actual.encode('utf-8'))
+                estado_anterior = nombre_persona_actual
+        else:
+            contador_ausente += 1
+            if contador_ausente >= UMBRAL_ESTABILIDAD and estado_anterior != "ausente":
+                cliente.publish(TOPICO_ESTADO_ROSTRO, b"ausente")
+                estado_anterior = "ausente"
+            
+        cv2.imshow("AuraBot - Reconocimiento Facial", frame)
+        cv2.waitKey(1)
+        
+    except Exception as e:
+        print(f"[!] Error: {e}")
 
 if __name__ == "__main__":
-    validar_modelo()
+    cliente = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+    cliente.on_connect = al_conectar
+    cliente.on_message = al_recibir_mensaje
+    cliente.connect(IP_BROKER, PUERTO, 60)
+    print("[*] Detector activo...")
+    cliente.loop_forever()
