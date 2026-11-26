@@ -1,4 +1,3 @@
-Markdown
 # AuraBot — Asistente Interactivo de Escritorio
 
 **Semestre:** ago-dic-2026  
@@ -72,64 +71,88 @@ AuraBot es un Sistema Inteligente de Monitoreo Ergonómico y Asistencia Cognitiv
 
 ```bash
 pip install -r servidor/requirements.txt
-Cómo ejecutar el sistema completo
-Levantar el broker MQTT (en una terminal aparte):
+```
 
-Bash
-mosquitto -v
-Cargar firmware en las placas ESP32:
+### Cómo ejecutar el sistema completo
 
-Configurar credenciales locales en firmware/config.py (basado en firmware/config_ejemplo.py).
+1. **Levantar el broker MQTT** (en una terminal aparte):
+   ```bash
+   mosquitto -v
+   ```
+2. **Cargar firmware en las placas ESP32:**
+   * Configurar credenciales locales en `firmware/config.py` (basado en `firmware/config_ejemplo.py`).
+   * Abrir **Thonny** → conectar la **ESP32 DevKit V1** → cargar `main.py`, `comunicacion.py`, `config.py` y la carpeta `hal/dispositivos.py`.
+   * Cargar el firmware de cámara ubicado en `firmware/cam/` en la **ESP32-CAM**.
+3. **Ejecutar los servicios del servidor Python:**
+   ```bash
+   cd servidor
+   python ia/detector_rostro.py
+   python firebase.py
+   ```
 
-Abrir Thonny → conectar la ESP32 DevKit V1 → cargar main.py, comunicacion.py, config.py y la carpeta hal/dispositivos.py.
+### Librerías ESP32 (MicroPython — corren en la placa)
 
-Cargar el firmware de cámara ubicado en firmware/cam/ en la ESP32-CAM.
+| Librería | Uso |
+| :--- | :--- |
+| `umqtt.simple` | Cliente MQTT para publicación de sensores y suscripción a comandos |
+| `machine` | Control de pines `Pin`, `PWM` (servos), `ADC` (LDR), `I2C` (OLED) y `UART` (audio) |
+| `network` | Gestión de conexión Wi-Fi en modo estación (`STA_IF`) |
+| `ssd1306` | Controlador gráfico para expresiones faciales en pantalla OLED |
+| `time` | Temporización no bloqueante (`ticks_ms`) y medición de pulsos (`time_pulse_us`) |
 
-Ejecutar los servicios del servidor Python:
+### Librerías servidor Python (corren en la PC)
 
-Bash
-cd servidor
-python ia/detector_rostro.py
-python firebase.py
+| Librería | Versión | Uso |
+| :--- | :--- | :--- |
+| `paho-mqtt` | `>= 2.0.0` | Comunicación MQTT entre broker Mosquitto, IA y Firebase |
+| `opencv-contrib-python` | `>= 4.8.0` | Decodificación de frames RGB565, detección DNN y reconocimiento LBPH |
+| `numpy` | `>= 1.24.0` | Manipulación matricial de arreglos de imagen y conversión de color |
+| `firebase-admin` | `>= 6.0.0` | Sincronización bidireccional con Firebase Realtime Database |
 
+---
 
-Librerías ESP32 (MicroPython — corren en la placa)
-Librería,Uso
-umqtt.simple,Cliente MQTT para publicación de sensores y suscripción a comandos
-machine,"Control de pines Pin, PWM (servos), ADC (LDR), I2C (OLED) y UART (audio)"
-network,Gestión de conexión Wi-Fi en modo estación (STA_IF)
-ssd1306,Controlador gráfico para expresiones faciales en pantalla OLED
-time,Temporización no bloqueante (ticks_ms) y medición de pulsos (time_pulse_us)
+## 🧠 Inteligencia Artificial
 
+* **Modelo:** Detector facial basado en redes neuronales profundas (**OpenCV DNN con arquitectura Caffe `res10_300x300_ssd`** y respaldo Haar Cascade) acoplado a un reconocedor facial **LBPH (*Local Binary Patterns Histograms*)** entrenado localmente (`modelo_rostro.yml`).
+* **Qué detecta:** Detecta la presencia de rostros humanos frente al escritorio a partir de frames RGB565 (`160x120`) transmitidos por la ESP32-CAM y clasifica la identidad del usuario registrado.
+* **Cómo toma decisiones:** El escaneo permanece en reposo hasta recibir la orden `"iniciar"` en `aurabot/comando/ia/escanear` (activada por proximidad). Al detectar un rostro, evalúa la distancia LBPH (`< 85`): si acumula **3 detecciones consecutivas válidas**, publica el nombre en `aurabot/estado_actual/rostro` y envía `"detener"` para liberar recursos; tras **8 intentos fallidos**, lo clasifica como `"Desconocido"` y detiene el escaneo.
+* **Confianza mínima aceptada:** **60%** (`0.60`) para la detección espacial del rostro en DNN y distancia euclidiana `< 85` para la validación de identidad en LBPH.
 
-Librerías servidor Python (corren en la PC)
-Librería,Versión,Uso
-paho-mqtt,>= 2.0.0,"Comunicación MQTT entre broker Mosquitto, IA y Firebase"
-opencv-contrib-python,>= 4.8.0,"Decodificación de frames RGB565, detección DNN y reconocimiento LBPH"
-numpy,>= 1.24.0,Manipulación matricial de arreglos de imagen y conversión de color
-firebase-admin,>= 6.0.0,Sincronización bidireccional con Firebase Realtime Database
+---
 
+## 🎥 Demostración
 
-Inteligencia ArtificialModelo: Detector facial basado en redes neuronales profundas (OpenCV DNN con arquitectura Caffe res10_300x300_ssd y respaldo Haar Cascade) acoplado a un reconocedor facial LBPH (Local Binary Patterns Histograms) entrenado localmente (modelo_rostro.yml).Qué detecta: Detecta la presencia de rostros humanos frente al escritorio a partir de frames RGB565 (160x120) transmitidos por la ESP32-CAM y clasifica la identidad del usuario registrado.Cómo toma decisiones: El escaneo permanece en reposo hasta recibir la orden "iniciar" en aurabot/comando/ia/escanear (activada por proximidad). Al detectar un rostro, evalúa la distancia LBPH (< 85): si acumula 3 detecciones consecutivas válidas, publica el nombre en aurabot/estado_actual/rostro y envía "detener" para liberar recursos; tras 8 intentos fallidos, lo clasifica como "Desconocido" y detiene el escaneo.Confianza mínima aceptada: 60% (0.60) para la detección espacial del rostro en DNN y distancia euclidiana < 85 para la validación de identidad en LBPH.🎥 DemostraciónVideo demostrativo (YouTube): ▶️ Ver video de funcionamiento en YouTube (Actualizar enlace antes del PR final)Fotos del prototipo finalVista frontalVista internaSistema en operación
+* **Video demostrativo (YouTube):** ▶️ [Ver video de funcionamiento en YouTube](https://www.youtube.com/) *(Actualizar enlace antes del PR final)*
 
+### Fotos del prototipo final
 
-📋 HAL — Hardware Abstraction Layer
-#,Componente,Pin ESP32,Tópico MQTT,Unidad,Rango válido
-1,Sensor PIR (HC-SR501),GPIO 13,aurabot/sensor/pir/central,Binario,0 (sin movimiento) – 1 (presencia)
-2,Ultrasónico (HC-SR04),TRIG: GPIO 25 / ECHO: GPIO 26,aurabot/sensor/ultrasonico/central,cm,2.0 – 400.0 cm (-1 fuera de rango)
-3,Fotorresistencia (LDR),GPIO 34 (ADC),aurabot/sensor/luz/central,%,0 – 100 %
-4,Relevador 5V (Luz ambiental),GPIO 23,aurabot/comando/relevador/central,Estado,"""encender"" / ""apagar"""
-5,Servomotor SG90 (Cabeza),GPIO 18 (PWM),aurabot/comando/servo/central,Grados (°),70° – 110° (90° reposo)
-6,Servomotor SG90 (Brazo Izq.),GPIO 19 (PWM),aurabot/comando/servo/central,Grados (°),20° – 130°
-7,Servomotor SG90 (Brazo Der.),GPIO 27 (PWM),aurabot/comando/servo/central,Grados (°),50° – 160°
-8,Pantalla OLED SSD1306 (I2C),SCL: GPIO 22 / SDA: GPIO 21,aurabot/comando/oled/central,Expresión,"""feliz"" / ""neutral"" / ""apagada"""
-9,DFPlayer Mini (UART 2),TX: GPIO 17 / RX: GPIO 16,aurabot/comando/audio/central,Pista / Cmd,"1 – 255 / ""stop"""
+| Vista frontal | Vista interna | Armado superior |
+| :---: | :---: | :---: |
+| ![Vista frontal](media/vista_frontal_prototipo.jpg) | ![Vista interna](media/integracion_en_carcasa%28prototipo%29.jpg) | ![Armado superior](media/primer_armado_prototipo_vista_superior.jpg) |
 
+---
 
-🔥 Esquema Firebase
-Estructura implementada en Firebase Realtime Database (aurabot-4ba95-default-rtdb.firebaseio.com):
+## 📋 HAL — Hardware Abstraction Layer
 
-Plaintext
+| # | Componente | Pin ESP32 | Tópico MQTT | Unidad | Rango válido |
+| :-: | :--- | :--- | :--- | :--- | :--- |
+| 1 | Sensor PIR (HC-SR501) | `GPIO 13` | `aurabot/sensor/pir/central` | Binario | `0` (sin movimiento) – `1` (presencia) |
+| 2 | Ultrasónico (HC-SR04) | `TRIG: GPIO 25` / `ECHO: GPIO 26` | `aurabot/sensor/ultrasonico/central` | `cm` | `2.0 – 400.0 cm` (`-1` fuera de rango) |
+| 3 | Fotorresistencia (LDR) | `GPIO 34` (ADC) | `aurabot/sensor/luz/central` | `%` | `0 – 100 %` |
+| 4 | Relevador 5V (Luz ambiental) | `GPIO 23` | `aurabot/comando/relevador/central` | Estado | `"encender"` / `"apagar"` |
+| 5 | Servomotor SG90 (Cabeza) | `GPIO 18` (PWM) | `aurabot/comando/servo/central` | Grados (`°`) | `70° – 110°` (`90°` reposo) |
+| 6 | Servomotor SG90 (Brazo Izq.) | `GPIO 19` (PWM) | `aurabot/comando/servo/central` | Grados (`°`) | `20° – 130°` |
+| 7 | Servomotor SG90 (Brazo Der.) | `GPIO 27` (PWM) | `aurabot/comando/servo/central` | Grados (`°`) | `50° – 160°` |
+| 8 | Pantalla OLED SSD1306 (I2C) | `SCL: GPIO 22` / `SDA: GPIO 21` | `aurabot/comando/oled/central` | Expresión | `"feliz"` / `"neutral"` / `"apagada"` |
+| 9 | DFPlayer Mini (UART 2) | `TX: GPIO 17` / `RX: GPIO 16` | `aurabot/comando/audio/central` | Pista / Cmd | `1 – 255` / `"stop"` |
+
+---
+
+## 🔥 Esquema Firebase
+
+Estructura implementada en **Firebase Realtime Database** (`aurabot-4ba95-default-rtdb.firebaseio.com`):
+
+```text
 /
 ├── sensores/
 │   └── telemetria/
@@ -154,11 +177,12 @@ Plaintext
         ├── evento: "Acceso detectado"
         ├── usuario: "Pedro"
         └── fecha_hora: "2026-11-04 10:12:19"
+```
 
+---
 
-⚠️ Retos técnicos encontrados
-Transmisión y decodificación de video sobre MQTT: Enviar imágenes comprimidas saturaba la memoria de la ESP32-CAM. Se resolvió transmitiendo frames crudos en formato RGB565 (160x120, 38,400 bytes) y reconstruyendo los canales BGR mediante operaciones a nivel de bits (numpy) en el servidor Python, activando la cámara únicamente cuando se detecta proximidad.
+## ⚠️ Retos técnicos encontrados
 
-Prevención de bucles infinitos entre Firebase y MQTT: Al sincronizar los comandos de la interfaz web hacia los actuadores y viceversa, existía el riesgo de generar ciclos de publicación repetida. Se solucionó implementando un diccionario de control de estado previo (ultimo_estado_actuador) en firebase_puente.py para publicar solo cuando existe un cambio real.
-
-Calibración mecánica simétrica de servomotores: Debido a la orientación opuesta de los brazos en la carcasa, un mismo ángulo producía movimientos contrarios. Se implementaron funciones de abstracción en dispositivos.py (reposo_servos, saludar_servos, respirar_servos) con ángulos complementarios (20° vs 160°) y retardos escalonados para evitar picos de corriente en la fuente de 5V.
+1. **Transmisión y decodificación de video sobre MQTT:** Enviar imágenes comprimidas saturaba la memoria de la ESP32-CAM. Se resolvió transmitiendo frames crudos en formato RGB565 (`160x120`, 38,400 bytes) y reconstruyendo los canales BGR mediante operaciones a nivel de bits (`numpy`) en el servidor Python, activando la cámara únicamente cuando se detecta proximidad.
+2. **Prevención de bucles infinitos entre Firebase y MQTT:** Al sincronizar los comandos de la interfaz web hacia los actuadores y viceversa, existía el riesgo de generar ciclos de publicación repetida. Se solucionó implementando un diccionario de control de estado previo (`ultimo_estado_actuador`) en `firebase.py` para publicar solo cuando existe un cambio real.
+3. **Calibración mecánica simétrica de servomotores:** Debido a la orientación opuesta de los brazos en la carcasa, un mismo ángulo producía movimientos contrarios. Se implementaron funciones de abstracción en `dispositivos.py` (`reposo_servos`, `saludar_servos`, `respirar_servos`) con ángulos complementarios (`20°` vs `160°`) y retardos escalonados para evitar picos de corriente en la fuente de 5V.
